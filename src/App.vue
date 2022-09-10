@@ -149,6 +149,7 @@
 .additional-sub-survey {
   display: flex;
   flex-direction: column;
+  padding: 10px;
 }
 
 .additional-sub-survey textarea {
@@ -158,5 +159,6 @@
 .consent-sub-survey {
   display: flex;
   gap: 10px;
+  padding: 10px;
 }
 </style>

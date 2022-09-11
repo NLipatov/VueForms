@@ -9,24 +9,43 @@
     email: yup.string().required().email(),
     lastname: yup.string().matches(/^[A-Za-z]+$/, 'Only english letters allowed').required().trim(),
     firstname: yup.string().matches(/^[A-Za-z]+$/, 'Only english letters allowed').required().trim(),
+    country: yup.string().oneOf(["United States", "Russia", "Germany", "China"], "Sorry, We have temporarily suspended orders from this country"),
+    birthDate: yup.date()
+    .transform(function (value, originalValue) {
+      if (this.isType(value)) {
+        return value;
+      }
+      const result = parse(originalValue, "dd.MM.yyyy", new Date());
+      return result;
+    })
+    .typeError("please enter a valid date")
+    .required()
+    .max(new Date(), "Please pick a valid date")
+    .min(`${new Date().getFullYear() - 120}-01-01`, "Please pick a valid date"),
+    gender: yup.string().oneOf(["male", "female"], "Please choose a gender").required()
   });
 
 // Create a form context with the validation schema
 useForm({
   validationSchema: schema,
 });
-const log = () => {
-  const exposed = nameForm.value.meta;
-  console.log(`dirty: ${exposed.dirty}\nvalid: ${exposed.valid}`);
-  if(!exposed.valid) {
-    console.log('not valid on submit')
-    console.log(nameForm.value.errorMessage)
-  }
+const log = (e) => {
+  e.preventDefault();
+  genderForm.value.handleChange()
+  nameForm.value.handleChange()
 }
 
-const nameForm = ref(null)
+
+
+const form = ref(null)
+const genderForm = ref(null);
+const nameForm = ref(null);
 onMounted(() => {
-  
+  // genderForm.value.meta.valid = false;
+  // genderForm.value.meta.dirty = true;
+  // genderForm.value.meta.touched = true;
+  // genderForm.value = 'female'
+  console.log(genderForm.value.meta)
 })
 
 const sideblockInputFields = []; 
@@ -35,30 +54,36 @@ const sideblockInputFields = [];
 <template>
   <div class="up-divider"></div>
   <div class="content">
-    <div class="survey-form">
+    <form ref="form">
+      <div class="survey-form">
       <div class="survey-edge upperEdge">
 
       </div>
       <div class="survey-body">
         <div class="survey-row-block">
             <div class="sideblock-survey">
-              <inputField ref="nameForm" name="firstname" titleBage="First name"/>
-              <inputField name="lastname" titleBage="Last name"/>
-              <inputField name="email" titleBage="Email"/>
+              <inputField ref="nameForm" name="firstname" titleBage="First name" componentType="input"/>
+              <inputField name="lastname" titleBage="Last name" componentType="input"/>
+              <inputField name="email" titleBage="Email" componentType="input"/>
             </div>
           <div class="sideblock-survey">
-            <select name="countries" placeholder="Your Country">\
+            <inputField ref="countrySelect" name="country" titleBage="Country" componentType="select"/>
+            <!-- <select name="countries" placeholder="Your Country">\
               <option value="none" selected disabled hidden>Select a country</option>
               <option value="States">United States</option>
               <option value="Germany">Germany</option>
               <option value="Russia">Russia</option>
               <option value="China">China</option>
-            </select>
-            <div class="birthday-sub-survey">
-              <label for="dateOfBirth">Date of Birth: </label>
-              <input id="dateOfBirth" type="date" />
+            </select> -->
+            <div>
+              <inputField name="birthDate" componentType="date"/>
+              <!-- <label for="dateOfBirth">Date of Birth: </label>
+              <input id="dateOfBirth" type="date" /> -->
             </div>
-            <div class="gender-sub-survey">
+            <div>
+              <inputField ref="genderForm" name="gender" componentType="gender-radio" />
+            </div>
+            <!-- <div class="gender-sub-survey">
               <span>
                 Your biological gender:
               </span>
@@ -67,7 +92,7 @@ const sideblockInputFields = [];
                 
                 <label for="css">Female</label>
                 <input type="radio" id="css" name="fav_language" value="CSS">
-            </div>
+            </div> -->
           </div>
         </div>
         <div class="additional-sub-survey">
@@ -87,9 +112,10 @@ const sideblockInputFields = [];
         </div>
       </div>
       <div class="survey-edge bottomEdge">
-        <button @click="log" type="button" class="btn btn-success" >Submit</button>
+        <button @click.prevent="log" type="submit" class="btn btn-success">Submit</button>
       </div>
     </div>
+    </form>
   </div>
 </template>
 
@@ -113,7 +139,7 @@ const sideblockInputFields = [];
 .survey-form {
   display: flex;
   flex-direction: column;
-  width: 60vw;
+  width: 50vw;
   background-color: transparent;
   box-shadow: 0px 0px 60px 40px rgba(34, 60, 80, 0.2);
   border-radius: 25px;
@@ -167,18 +193,7 @@ const sideblockInputFields = [];
   height: 30px;
 }
 
-.birthday-sub-survey {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
 
-.birthday-sub-survey input {
-  width: 85%;
-}
-.birthday-sub-survey label {
-  width: 50%;
-}
 
 .gender-sub-survey {
   display: flex;

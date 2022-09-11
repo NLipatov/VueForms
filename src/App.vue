@@ -1,26 +1,58 @@
 <script setup>
+  import { ref, onMounted } from 'vue'
+  import { useField, useForm  } from 'vee-validate';
+  import * as yup from 'yup';
+  import inputField from './components/inputField.vue';
+
+  // Define a validation schema
+  const schema = yup.object({
+    email: yup.string().required().email(),
+    lastname: yup.string().matches(/^[A-Za-z]+$/, 'Only english letters allowed').required().trim(),
+    firstname: yup.string().matches(/^[A-Za-z]+$/, 'Only english letters allowed').required().trim(),
+  });
+
+// Create a form context with the validation schema
+useForm({
+  validationSchema: schema,
+});
+const log = () => {
+  const exposed = nameForm.value.meta;
+  console.log(`dirty: ${exposed.dirty}\nvalid: ${exposed.valid}`);
+  if(!exposed.valid) {
+    console.log('not valid on submit')
+    console.log(nameForm.value.errorMessage)
+  }
+}
+
+const nameForm = ref(null)
+onMounted(() => {
+  
+})
+
+const sideblockInputFields = []; 
 </script>
 
 <template>
   <div class="up-divider"></div>
   <div class="content">
     <div class="survey-form">
-      <div class="survey-edge">
+      <div class="survey-edge upperEdge">
 
       </div>
       <div class="survey-body">
         <div class="survey-row-block">
             <div class="sideblock-survey">
-            <input placeholder="First name"/>
-            <input placeholder="Last name"/>
-            <input placeholder="Email"/>
-          </div>
+              <inputField ref="nameForm" name="firstname" titleBage="First name"/>
+              <inputField name="lastname" titleBage="Last name"/>
+              <inputField name="email" titleBage="Email"/>
+            </div>
           <div class="sideblock-survey">
-            <select name="cars" id="cars" placeholder="Your Country">
-              <option value="volvo">United States</option>
-              <option value="saab">Germany</option>
-              <option value="mercedes">Russia</option>
-              <option value="audi">China</option>
+            <select name="countries" placeholder="Your Country">\
+              <option value="none" selected disabled hidden>Select a country</option>
+              <option value="States">United States</option>
+              <option value="Germany">Germany</option>
+              <option value="Russia">Russia</option>
+              <option value="China">China</option>
             </select>
             <div class="birthday-sub-survey">
               <label for="dateOfBirth">Date of Birth: </label>
@@ -54,8 +86,8 @@
           </div>
         </div>
       </div>
-      <div class="survey-edge">
-        <button type="button" class="btn btn-success">Success</button>
+      <div class="survey-edge bottomEdge">
+        <button @click="log" type="button" class="btn btn-success" >Submit</button>
       </div>
     </div>
   </div>
@@ -81,19 +113,30 @@
 .survey-form {
   display: flex;
   flex-direction: column;
-  height: 500px;
   width: 60vw;
-  background-color: white;
+  background-color: transparent;
   box-shadow: 0px 0px 60px 40px rgba(34, 60, 80, 0.2);
+  border-radius: 25px;
 }
 
 .survey-edge{
   display: flex;
   justify-content: center;
   padding: 10px;
-  height: 10%;
+  height: 45px;
   background-color: lightgray;
 }
+
+.upperEdge {
+  border-top-left-radius: 25px;
+  border-top-right-radius: 25px;
+}
+
+.bottomEdge {
+  border-bottom-left-radius: 25px;
+  border-bottom-right-radius: 25px;
+}
+
 .survey-edge .btn {
   --bs-btn-padding-y: .25rem;
   --bs-btn-padding-x: .5rem;
@@ -103,8 +146,10 @@
 .survey-body {
   display: flex;
   flex-direction: column;
-  height: 90%;
+  min-height: 400px;
   padding: 10px;
+  justify-content: center;
+  background-color: white;
 }
 
 .sideblock-survey {

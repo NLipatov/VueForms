@@ -8,21 +8,36 @@
       <div class="survey-body">
         <div class="survey-row-block">
             <div class="sideblock-survey">
-              <input @change="setFirstNameDirty" name="firstname" v-model="firstname" placeholder="First name"/>
+              <div class="input-placeholder">
+                  <input name="firstname" v-model="firstname" type="text" required>
+                  <div class="placeholder">
+                    <span>First name</span><span>*</span>
+                  </div>
+              </div>
               <div class="error-wrapper" v-if="errors.firstname && firstNameDirty">
                 <div class="arrow-up"></div>
                 <div class="error">
                     <span>{{ errors.firstname }}</span>
                 </div>
               </div>
-              <input @change="setLastNameDirty" name="lastname" v-model="lastname" placeholder="Last name"/>
+              <div class="input-placeholder">
+                  <input name="lastname" v-model="lastname" type="text" required>
+                  <div class="placeholder">
+                    <span>Last name</span><span>*</span>
+                  </div>
+              </div>
               <div class="error-wrapper" v-if="errors.lastname && lastNameDirty">
                 <div class="arrow-up"></div>
                 <div class="error">
                     <span>{{ errors.lastname }}</span>
                 </div>
               </div>
-              <input @change="setEmailDirty" name="email" v-model="email" placeholder="Email" />
+              <div class="input-placeholder">
+                  <input name="email" v-model="email" type="text" required>
+                  <div class="placeholder">
+                    <span>Email</span><span>*</span>
+                  </div>
+              </div>
               <div class="error-wrapper" v-if="errors.email && emailDirty">
                 <div class="arrow-up"></div>
                 <div class="error">
@@ -32,7 +47,6 @@
             </div>
           <div class="sideblock-survey">
             <select
-              ref="countrySelect"
               @change="updateInput"
             >
               <option disabled selected value>Select your country</option>
@@ -52,7 +66,7 @@
             <div style="display: flex; flex-direction: column;">
               <div style="display: flex; align-items: center; justify-content: space-between; height: 30px; margin-bottom: 10px;">
                 <label for="dateOfBirth">Date of Birth: </label>
-                <input @change="setbirthDateDirty" name="birthdate" v-model="birthdate" id="dateOfBirth" type="date" />
+                <input name="birthdate" v-model="birthdate" id="dateOfBirth" type="date" />
               </div>
               <div class="error-wrapper" v-if="errors.birthdate && birthDateDirty">
                 <div class="arrow-up"></div>
@@ -66,7 +80,7 @@
               <span>
               Gender:
               </span>
-              <div @change="setGenderDirty" style="display: flex; width: 75%; border: 2px solid black; align-items: center;">
+              <div style="display: flex; width: 75%; border: 2px solid black; align-items: center;">
                 <div style="width: 50%; justify-content: center; display: flex; gap: 5px; align-self: center;">
                   <label for="male">Male</label>
                   <input v-model="gender" type="radio" id="male" name="gender" value="male">
@@ -78,13 +92,13 @@
                 </div>
               </div>
             </div>
-            <div class="error-wrapper" v-if="errors.gender && genderDirty">
-                <div class="arrow-up"></div>
-                <div class="error">
-                    <span>{{ errors.gender }}</span>
-                </div>
-              </div>
             </div>
+            <div class="error-wrapper" v-if="errors.gender && genderDirty">
+                  <div class="arrow-up"></div>
+                  <div class="error">
+                      <span>{{ errors.gender }}</span>
+                  </div>
+              </div>
           </div>
         </div>
         <div class="additional-sub-survey">
@@ -103,7 +117,7 @@
                 <label for="personalData">Would you allow to process your personal information by our company?</label>
                 <input @change="setPersonaldataDirty" v-model="personaldata" name="personaldata" id="personalData" type="checkbox">
               </div>
-              <div class="error-wrapper" v-if="errors.personaldata && personaldataDirty">
+              <div class="error-wrapper" v-if="personaldataDirty && errors.personaldata">
                   <div class="arrow-up"></div>
                   <div class="error">
                       <span>{{ errors.personaldata }}</span>
@@ -114,7 +128,7 @@
         </div>
       </div>
       <div class="survey-edge bottomEdge">
-        <button @click.prevent="log" type="submit" class="btn btn-success">Submit</button>
+        <button @click.prevent="onSubmit" type="submit" class="btn btn-success">Submit</button>
       </div>
     </div>
     </form>
@@ -127,19 +141,16 @@ import { onMounted, ref } from 'vue';
 
 const updateInput = (e) => {
   selectedCounty.value = e.target.value;
-  console.log(e.target.value);
-  setCountryDirty();
 };
 
 const countries = ["United States", "Russia", "Germany", "China", "North Korea"];
 
 // Define a validation schema
 const simpleSchema = yup.object({
-  email: yup.string().required().email(),
-  password: yup.string().required().min(8),
-  firstname: yup.string().matches(/^[A-Za-z]+$/, 'Only english alphabet letters allowed').required().trim(),
-  lastname: yup.string().matches(/^[A-Za-z]+$/, 'Only english alphabet letters allowed').required().trim(),
-  selectedCounty: yup.string().oneOf(["United States", "Russia", "Germany", "China"], "Sorry, We have temporarily suspended orders from this country").required(),
+  email: yup.string().email().required("Please enter your email"),
+  firstname: yup.string().matches(/^[A-Za-z]+$/, 'Only english alphabet letters allowed').trim().required("Please enter your name"),
+  lastname: yup.string().matches(/^[A-Za-z]+$/, 'Only english alphabet letters allowed').trim().required("Please enter your lastname"),
+  selectedCounty: yup.string().oneOf(countries.slice(0, -1), "Sorry, We have temporarily suspended orders from your country").required("Please select your country"),
   birthdate: yup.date()
     .transform(function (value, originalValue) {
       if (this.isType(value)) {
@@ -149,10 +160,10 @@ const simpleSchema = yup.object({
       return result;
     })
     .typeError("please enter a valid date")
-    .required()
+    .required("Please select your birthdate")
     .max(new Date(), "Please pick a valid date")
     .min(`${new Date().getFullYear() - 120}-01-01`, "Please pick a valid date"),
-    gender: yup.string().oneOf(["male", "female"], "Please choose a gender").required(),
+    gender: yup.string().required("Please choose your gender"),
     personaldata: yup.bool().isTrue().required("We need your consent to work with your personal data")
 });
 // Create a form context with the validation schema
@@ -176,32 +187,18 @@ const genderDirty = ref(false)
 const birthDateDirty = ref(false)
 const personaldataDirty = ref(false)
 
-const setFirstNameDirty = () => {
-  firstNameDirty.value = true;
-}
+const fieldDirtyAttributes = [firstNameDirty, lastNameDirty, emailDirty, countryDirty, genderDirty, birthDateDirty, personaldataDirty ]
 
-const setLastNameDirty = () => {
-  lastNameDirty.value = true;
-}
+const onSubmit = () => {
+  console.log(errors)
+  const form = {
+    firstname: firstname.value,
+    lastname: lastname.value,
+    email: email.value,
+  }
+  console.log(form)
 
-const setEmailDirty = () => {
-  emailDirty.value = true;
-}
-
-const setCountryDirty = () => {
-  countryDirty.value = true;
-}
-
-const setGenderDirty = () => {
-  genderDirty.value = true;
-}
-
-const setbirthDateDirty = () => {
-  birthDateDirty.value = true;
-}
-
-const setPersonaldataDirty = () => {
-  personaldataDirty.value = true;
+  fieldDirtyAttributes.map(x=>x.value = true)
 }
 
 onMounted(() => {
@@ -226,7 +223,7 @@ onMounted(() => {
   .survey-form {
     display: flex;
     flex-direction: column;
-    width: 50vw;
+    width: auto;
     background-color: transparent;
     box-shadow: 0px 0px 60px 40px rgba(34, 60, 80, 0.2);
     border-radius: 25px;
@@ -277,7 +274,6 @@ onMounted(() => {
     height: 30px;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 15px;
   }
   .survey-row-block {
     display: flex;
@@ -326,7 +322,45 @@ onMounted(() => {
     border-bottom: 5px solid #dc3545;
   }
 
+  .mt-5 {
+    margin-top: -5px;
+  }
+
   .error-wrapper {
     margin-top: -10px;
+  }
+
+  .input-placeholder {
+    position: relative;
+  }
+  .input-placeholder input {
+    width: 100%;
+  }
+  .input-placeholder input:valid + .placeholder {
+    display: none;
+  }
+
+  .placeholder {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    padding-left: 5px;
+    padding-right: 5px;
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    bottom: 0;
+    left: 0px;
+    margin: auto;
+    color: transparent;
+    width: 100%;
+  }
+
+  .placeholder span:nth-child(1) {
+    color: black;
+  }
+
+  .placeholder span:nth-child(2) {
+    color: red;
   }
   </style>

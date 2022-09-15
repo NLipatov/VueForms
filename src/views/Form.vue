@@ -1,11 +1,4 @@
 <template>
-  <router-view>
-    
-  </router-view>
-</template>
-
-
-<!-- <template>
   <div class="up-divider"></div>
   <div class="content">
     <form ref="form">
@@ -398,4 +391,4 @@ onMounted(() => {
     display: flex;
     justify-content: space-between;
   }
-  </style> -->
+  </style>

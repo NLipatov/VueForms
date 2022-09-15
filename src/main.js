@@ -9,10 +9,25 @@ import { faTwitter } from '@fortawesome/free-brands-svg-icons';
 
 import { createApp } from "vue";
 import { createPinia } from "pinia";
+import { createRouter, createWebHistory } from "vue-router";
 
 import App from "./App.vue";
+import Home from "./views/Home.vue";
+import About from "./views/About.vue";
+import Form from "./views/Form.vue";
 
-const app = createApp(App).component('font-awesome-icon', FontAwesomeIcon);
+const router = createRouter(
+    {
+        history: createWebHistory(),
+        routes: [
+            {path: '/', name: 'Home', component: Home},
+            {path: '/about', name: 'About', component: About},
+            {path: '/form', name: 'Form', component: Form},
+        ]
+    }
+);
+
+const app = createApp(App).use(router).component('font-awesome-icon', FontAwesomeIcon);
 
 library.add(faMars,faVenus)
 

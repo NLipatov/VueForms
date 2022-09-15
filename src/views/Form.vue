@@ -10,12 +10,12 @@
                         <div class="success-message">
                             <font-awesome-icon class="success-send-icon" icon="fa-solid fa-circle-check" />
                             <span>Success!</span>
-                            <span>We've received your form. You can now proceed to 'Table' to analyse your fullfilled forms!</span>
+                            <span>We've received your form. You can now proceed to 'Table' to analyse fullfilled forms!</span>
                         </div>
                     </div>
                     <div class="survey-body" v-if="!isFormSent">
                         <div class="survey-row-block">
-                            <div class="sideblock-survey">
+                            <div class="sideblock-survey" style="width: 45%;">
                                 <div class="input-placeholder">
                                     <input name="firstname" v-model="firstname" type="text" required>
                                     <div class="placeholder">
@@ -53,10 +53,14 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="sideblock-survey">
+                            <div class="sideblock-survey" style="width: 55%;">
                                 <div class="countrySelect">
-                                    <span>Country:</span>
+                                    <div>
+                                        <span>Country:</span>
+                                        <span style="color: red;">*</span>
+                                    </div>
                                     <select
+                                    style="width: 65%;"
                                     @change="updateInput"
                                     >
                                         <option disabled selected value>Select a country</option>
@@ -74,9 +78,9 @@
                                     </div>
                                 </div>
                                 <div style="display: flex; flex-direction: column;">
-                                    <div style="display: flex; align-items: center; justify-content: space-between; height: 30px; margin-bottom: 10px;">
-                                        <label for="dateOfBirth">Date of Birth: </label>
-                                        <input name="birthdate" v-model="birthdate" id="dateOfBirth" type="date" />
+                                    <div style="display: flex; align-items: center; justify-content: space-between; height: 30px;">
+                                        <label for="dateOfBirth" class="red-asteriks">DOB:</label>
+                                        <input style="width: 65%;" name="birthdate" v-model="birthdate" id="dateOfBirth" type="date" />
                                     </div>
                                     <div class="error-wrapper" v-if="errors.birthdate && birthDateDirty">
                                         <div class="arrow-up"></div>
@@ -87,8 +91,8 @@
                                 </div>
                                 <div>
                                     <div class="gender-sub-survey">
-                                        <span>
-                                        Gender:
+                                        <span class="red-asteriks">
+                                        Sex:
                                         </span>
                                         <div style="display: flex; width: 75%; align-items: center;">
                                             <div style="width: 50%; justify-content: center; display: flex; gap: 5px; align-self: center;">
@@ -307,7 +311,6 @@ onMounted(() => {
     .sideblock-survey {
         display: flex;
         flex-direction: column;
-        width: 50%;
         padding: 10px;
         gap: 10px;
     }
@@ -441,5 +444,9 @@ onMounted(() => {
     .success-message span:nth-child(2) {
         font-size: 18pt;
         font-weight: bold;
+    }
+    .red-asteriks::after{
+        content: "*";
+        color: red;
     }
   </style>

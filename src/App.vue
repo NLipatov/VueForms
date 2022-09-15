@@ -46,17 +46,19 @@
               </div>
             </div>
           <div class="sideblock-survey">
-            <select
-              @change="updateInput"
-            >
-              <option disabled selected value>Select your country</option>
-              <option
-                  v-for="(optie) in countries"
-                  :value="optie"
-                >{{ optie }}
-              </option>
-            </select>
-            
+            <div class="countrySelect">
+              <span>Country:</span>
+              <select
+                @change="updateInput"
+              >
+                <option disabled selected value>Select a country</option>
+                <option
+                    v-for="(optie) in countries"
+                    :value="optie"
+                  >{{ optie }}
+                </option>
+              </select>
+            </div>
             <div class="error-wrapper" v-if="errors.selectedCounty && countryDirty">
                 <div class="arrow-up"></div>
                 <div class="error">
@@ -80,15 +82,19 @@
               <span>
               Gender:
               </span>
-              <div style="display: flex; width: 75%; border: 2px solid black; align-items: center;">
+              <div style="display: flex; width: 75%; align-items: center;">
                 <div style="width: 50%; justify-content: center; display: flex; gap: 5px; align-self: center;">
-                  <label for="male">Male</label>
-                  <input v-model="gender" type="radio" id="male" name="gender" value="male">
+                  <label for="male">
+                    <font-awesome-icon :class="gender === 'male' ? '_choosen-gender' : null" class="gender-icon" icon="fa-mars" />
+                  </label>
+                  <input hidden v-model="gender" type="radio" id="male" name="gender" value="male">
                 </div>
                 <div class="gender-divider"></div>
                 <div style="width: 50%; justify-content: center; display: flex; gap: 5px; align-self: center;">
-                  <label for="female">Female</label>
-                    <input v-model="gender" type="radio" id="female" name="gender" value="female">
+                  <label for="female">
+                    <font-awesome-icon :class="gender === 'female' ? '_choosen-gender' : null" class="gender-icon" icon="fa-venus" />
+                  </label>
+                  <input hidden v-model="gender" type="radio" id="female" name="gender" value="female">
                 </div>
               </div>
             </div>
@@ -102,19 +108,19 @@
           </div>
         </div>
         <div class="additional-sub-survey">
-          <label>We would be very thankful if you could provide any additional information:</label>
-          <textarea id="additional information" rows="4"></textarea>
+          <label>Few words about you:</label>
+          <textarea v-model="additionalInformation" id="additional information" rows="4"></textarea>
         </div>
         <div>
           <div class="consent-sub-survey">          
-            <label for="communicationConsent">Would you like to receive electronic communication by email?</label>
-            <input id="communicationConsent" type="checkbox">
+            <label for="communicationConsent">Would you like to receive email communications?</label>
+            <input v-model="communications" id="communicationConsent" type="checkbox">
           </div>
 
           <div class="consent-sub-survey">
             <div class="consent-wrapper">
               <div class="consent-checkbox">
-                <label for="personalData">Would you allow to process your personal information by our company?</label>
+                <label for="personalData">Would you allow us to store your personal data?</label>
                 <input @change="setPersonaldataDirty" v-model="personaldata" name="personaldata" id="personalData" type="checkbox">
               </div>
               <div class="error-wrapper" v-if="personaldataDirty && errors.personaldata">
@@ -138,6 +144,7 @@
 import { useForm } from 'vee-validate';
 import * as yup from 'yup';
 import { onMounted, ref } from 'vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 const updateInput = (e) => {
   selectedCounty.value = e.target.value;
@@ -164,7 +171,7 @@ const simpleSchema = yup.object({
     .max(new Date(), "Please pick a valid date")
     .min(`${new Date().getFullYear() - 120}-01-01`, "Please pick a valid date"),
     gender: yup.string().required("Please choose your gender"),
-    personaldata: yup.bool().isTrue().required("We need your consent to work with your personal data")
+    personaldata: yup.bool().isTrue().required("We need your consent to process your personal data")
 });
 // Create a form context with the validation schema
 const { errors, useFieldModel } = useForm({
@@ -178,6 +185,8 @@ const birthdate = useFieldModel('birthdate');
 const gender = useFieldModel('gender');
 const personaldata = useFieldModel('personaldata');
 const selectedCounty = useFieldModel('selectedCounty');
+const additionalInformation = ref("");
+const communications = ref(false);
 
 const firstNameDirty = ref(false)
 const lastNameDirty = ref(false)
@@ -195,6 +204,12 @@ const onSubmit = () => {
     firstname: firstname.value,
     lastname: lastname.value,
     email: email.value,
+    country: selectedCounty.value,
+    birthdate: birthdate.value,
+    gender: gender.value,
+    additionlInformation: additionalInformation.value,
+    communications: communications.value,
+
   }
   console.log(form)
 
@@ -290,6 +305,7 @@ onMounted(() => {
     display: flex;
     gap: 10px;
     padding: 10px;
+    justify-content: center;
   }
 
   .consent-wrapper {
@@ -320,10 +336,6 @@ onMounted(() => {
     border-right: 5px solid transparent;
     
     border-bottom: 5px solid #dc3545;
-  }
-
-  .mt-5 {
-    margin-top: -5px;
   }
 
   .error-wrapper {
@@ -362,5 +374,21 @@ onMounted(() => {
 
   .placeholder span:nth-child(2) {
     color: red;
+  }
+
+  .gender-icon{
+    font-size: 20pt;
+    color: lightgray;
+  }
+  ._choosen-gender {
+    border-bottom: 2px solid #00b7a5;
+    color: black;
+  }
+  input {
+    padding: 5px;
+  }
+  .countrySelect {
+    display: flex;
+    justify-content: space-between;
   }
   </style>

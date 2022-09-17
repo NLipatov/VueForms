@@ -1,3 +1,19 @@
+<script setup>
+
+</script>
+
 <template>
-    <h1>Table</h1>
+    <div class="up-divider">
+
+    </div>
 </template>
+
+<style>
+    .up-divider {
+        position: absolute;
+        height: 50vh;
+        width: 100vw;
+        background-color: #41B883;
+        z-index: -1;
+    }
+</style>

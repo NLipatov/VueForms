@@ -6,14 +6,21 @@
                 <div class="survey-form">
                     <div class="survey-edge upperEdge">
                     </div>
+                    <div class="survey-body" v-if="isFormSentAttemptFailed">
+                        <div class="request-message">
+                            <font-awesome-icon class="failed-send-icon" icon="fa-solid fa-circle-xmark" />
+                            <span>Oh no!</span>
+                            <span>Attemption to sent your form was failed!</span>
+                        </div>
+                    </div>
                     <div class="survey-body" v-if="isFormSent">
-                        <div class="success-message">
+                        <div class="request-message">
                             <font-awesome-icon class="success-send-icon" icon="fa-solid fa-circle-check" />
                             <span>Success!</span>
                             <span>We've received your form. You can now proceed to 'Table' to analyse fullfilled forms!</span>
                         </div>
                     </div>
-                    <div class="survey-body" v-if="!isFormSent">
+                    <div class="survey-body" v-if="!isFormSent && !isFormSentAttemptFailed">
                         <div class="survey-row-block">
                             <div class="sideblock-survey" style="width: 45%;">
                                 <div class="input-placeholder">
@@ -146,7 +153,7 @@
                         </div>
                     </div>
                     <div class="survey-edge bottomEdge">
-                        <button v-if="!isFormSent" @click.prevent="onSubmit" type="submit" class="btn btn-success">Submit</button>
+                        <button v-if="!isFormSent && !isFormSentAttemptFailed" @click.prevent="onSubmit" type="submit" class="btn btn-success">Submit</button>
                     </div>
                 </div>
             </form>
@@ -211,8 +218,28 @@ const personaldataDirty = ref(false)
 
 const isFormFilledCorrectly = ref(false);
 const isFormSent = ref(false);
+const isFormSentAttemptFailed = ref(false);
 
 const fieldDirtyAttributes = [firstNameDirty, lastNameDirty, emailDirty, countryDirty, genderDirty, birthDateDirty, personaldataDirty ]
+
+const sendFormToBackend = async(form) => {
+    console.log(`form to send: ${JSON.stringify(form)}`);
+
+    const requestOptions = {
+        method: 'POST'
+    };
+
+    try{
+        const request = await fetch(`http://localhost:5053/VueForms/SaveOwner?JsonObject=${JSON.stringify(form)}`, requestOptions);
+        if(request.status === 200)
+        {
+            isFormSent.value = true;
+        }
+    }
+    catch{
+        isFormSentAttemptFailed.value = true;
+    }
+}
 
 const onSubmit = () => {
     const isFormValid = JSON.stringify(errors._value).length === 2;
@@ -224,24 +251,16 @@ const onSubmit = () => {
     birthdate: birthdate.value,
     gender: gender.value,
     additionlInformation: additionalInformation.value,
-    communications: communications.value,
+    communications: `${communications.value}`,
 
   }
 
   fieldDirtyAttributes.map(x=>x.value = true)
-
-
-  
-   console.log(form)
   
   if(isFormValid)
   {
+    sendFormToBackend(form);
     isFormFilledCorrectly.value = true;
-    isFormSent.value = true;
-  }
-  else
-  {
-    console.log('fail')
   }
 }
 
@@ -432,16 +451,19 @@ onMounted(() => {
     .success-send-icon {
         color: #4CAF50;
     }
-    .success-message {
+    .failed-send-icon {
+        color: #a11c1c;
+    }
+    .request-message {
         display: flex;
         flex-direction: column;
         align-items: center;
         padding: 10px;
     }
-    .success-message svg {
+    .request-message svg {
         font-size: 50pt;
     }
-    .success-message span:nth-child(2) {
+    .request-message span:nth-child(2) {
         font-size: 18pt;
         font-weight: bold;
     }

@@ -4,7 +4,7 @@ import "bootstrap/dist/css/bootstrap.css";
 //FontAwesome imports:
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faMars, faVenus, faTable, faPenToSquare, faCircleCheck  } from '@fortawesome/free-solid-svg-icons';
+import { faMars, faVenus, faTable, faPenToSquare, faCircleCheck, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { faTwitter } from '@fortawesome/free-brands-svg-icons';
 
 import { createApp } from "vue";
@@ -31,7 +31,7 @@ const router = createRouter(
 
 const app = createApp(App).use(router).component('font-awesome-icon', FontAwesomeIcon);
 
-library.add(faMars, faVenus, faPenToSquare, faTable, faCircleCheck)
+library.add(faMars, faVenus, faPenToSquare, faTable, faCircleCheck, faCircleXmark)
 
 app.use(createPinia());
 

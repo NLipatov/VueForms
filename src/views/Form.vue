@@ -165,6 +165,7 @@ import { useForm } from 'vee-validate';
 import * as yup from 'yup';
 import { onMounted, ref } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import config from '../../public/config.json';
 
 const updateInput = (e) => {
   selectedCounty.value = e.target.value;
@@ -223,14 +224,12 @@ const isFormSentAttemptFailed = ref(false);
 const fieldDirtyAttributes = [firstNameDirty, lastNameDirty, emailDirty, countryDirty, genderDirty, birthDateDirty, personaldataDirty ]
 
 const sendFormToBackend = async(form) => {
-    console.log(`form to send: ${JSON.stringify(form)}`);
-
     const requestOptions = {
         method: 'POST'
     };
 
     try{
-        const request = await fetch(`http://localhost:5053/VueForms/SaveOwner?JsonObject=${JSON.stringify(form)}`, requestOptions);
+        const request = await fetch(`${config.BackendService}/VueForms/SaveOwner?JsonObject=${JSON.stringify(form)}`, requestOptions);
         if(request.status === 200)
         {
             isFormSent.value = true;
@@ -265,6 +264,7 @@ const onSubmit = () => {
 }
 
 onMounted(() => {
+    console.log(config)
 })
 </script>
 

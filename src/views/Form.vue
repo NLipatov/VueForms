@@ -165,7 +165,7 @@ import { useForm } from 'vee-validate';
 import * as yup from 'yup';
 import { onMounted, ref } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import config from '../../public/config.json';
+import config from '../config.json';
 
 const updateInput = (e) => {
   selectedCounty.value = e.target.value;

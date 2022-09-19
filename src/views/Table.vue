@@ -5,27 +5,82 @@
     const rawOwners = ref(null);
     const owners = ref([]);
 
-    const fetchColumns = fetch(`${config.BackendService}/VueForms/DefineTableColumns`)
-    .then((response) => response.json())
-    .then((data) => {
-        if(data.length > 0) {
-            columns.value = data;
-        }
-    });
+    const fetchColumns = () => {
+        fetch(`${config.BackendService}/VueForms/DefineTableColumns`)
+        .then((response) => response.json())
+        .then((data) => {
+            if(data.length > 0) {
+                columns.value = data;
+            }
+        });
+    }
 
-    const fetchOwners = fetch(`${config.BackendService}/VueForms/LoadAllOwners`)
-    .then((response) => response.json())
-    .then((data) => {
-        if(data.length > 0) {
-        rawOwners.value = data;
-        parseServerOwnersResponse(data)
-        }
-    });
+    const fetchOwners = () =>{
+        fetch(`${config.BackendService}/VueForms/LoadAllOwners`)
+        .then((response) => response.json())
+        .then((data) => {
+            if(data.length > 0) {
+            rawOwners.value = data;
+            parseServerOwnersResponse(data)
+            }
+        });
+    }
+
+    fetchColumns();
+    fetchOwners();
+
+    const handleInclusiveSearch = (query) => {
+        fetch(`${config.BackendService}/VueForms/InclusiveSearchAsync/${query}`)
+        .then((response) => response.json())
+        .then((data) => {
+            if(data.length > 0) {
+                rawOwners.value = data;
+                parseServerSearchResponse(data)
+            }
+        });
+    }
+
+    const handleExclusiveSearch = (query) => {
+        fetch(`${config.BackendService}/VueForms/ExclusiveSearchAsync/${query}`)
+        .then((response) => response.json())
+        .then((data) => {
+            if(data.length > 0) {
+                rawOwners.value = data;
+                parseServerSearchResponse(data)
+            }
+        });
+    }
 
     const parseServerOwnersResponse = (response) => {
         for(let i = 0; i < response.length; i++) {
             const owner = JSON.parse(response[i].jsonString);
             owners.value.push(owner);
+        }
+    }
+
+    const parseServerSearchResponse = (response) => {
+        for(let i = 0; i < response.length; i++) {
+            const owner = JSON.parse(response[i]);
+            owners.value.push(owner);
+        }
+    }
+
+    const searchinput = ref(null);
+    const isInclusive = ref(false);
+
+    const onSearch = () => {
+        owners.value = [];
+        if(isInclusive.value && searchinput.value.length > 0)
+        {
+            handleInclusiveSearch(searchinput.value)
+        }
+        else if(!isInclusive.value && searchinput.value.length > 0)
+        {
+            handleExclusiveSearch(searchinput.value);
+        }
+        else if(searchinput.value.length === 0)
+        {
+            fetchOwners();
         }
     }
 
@@ -41,11 +96,11 @@
                 <div class="searchbar">
                     <div class="input-option-block">
                         <span>Use inclusive search</span>
-                        <input type="checkbox"/>
+                        <input v-model="isInclusive" type="checkbox"/>
                     </div>
                     <div class="searchinput-container">
-                        <input placeholder="divide search criterias with ';'" />
-                        <button>Search</button>
+                        <input @change="onSearch" v-model="searchinput" placeholder="divide search criterias with ';'" />
+                        <button @click="onSearch">Search</button>
                     </div>
                 </div>
                 <div class="table-content">
@@ -119,8 +174,20 @@
     td {
         border: 1px solid lightgray;
     }
+    th:nth-child(1){
+        border-left: none !important;
+    }
+    td:nth-child(1){
+        border-left: none;
+    }
+    th:last-child{
+        border-right: none !important;
+    }
+    td:last-child{
+        border-right: none;
+    }
     th {
-        border: 1px solid lightgray;
+        border: 1px solid lightgray !important;
     }
     .center-caption tr th{
         display: flex;

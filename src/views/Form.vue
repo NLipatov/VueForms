@@ -272,6 +272,7 @@ const onSubmit = () => {
         position: absolute;
         top: 0;
         z-index: -1;
+        overflow: hidden;
     }
     .up-divider {
         position: absolute;

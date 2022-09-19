@@ -139,7 +139,7 @@
                         <div class="consent-sub-survey">
                             <div class="consent-wrapper">
                                 <div class="consent-checkbox">
-                                    <label for="personalData">Would you allow us to store your personal data?</label>
+                                    <label for="personalData" class="red-asteriks">Would you allow us to store your personal data?</label>
                                     <input @change="setPersonaldataDirty" v-model="personaldata" name="personaldata" id="personalData" type="checkbox">
                                 </div>
                                 <div class="error-wrapper" v-if="personaldataDirty && errors.personaldata">

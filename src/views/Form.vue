@@ -163,7 +163,7 @@
 <script setup>
 import { useForm } from 'vee-validate';
 import * as yup from 'yup';
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import config from '../config.json';
 
@@ -263,9 +263,6 @@ const onSubmit = () => {
   }
 }
 
-onMounted(() => {
-    console.log(config)
-})
 </script>
 
 <style scoped>
